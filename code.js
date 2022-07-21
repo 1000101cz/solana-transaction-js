@@ -1,38 +1,55 @@
+// EXAMPLE
+//
+//sendLamports("/home/user/keypair.json","ATKcvtbtgXExHd3xZqb97M3Ab1jg2NZ8ztL8fCRJU2N1",1000000);
+
 let web3 = require('@solana/web3.js');
 
-// read source wallet keypair
-const keypair = require('/path/keypair.json'); // TODO: EDIT
-let slicedJsonData = keypair.slice(0,32);
-let wallet = web3.Keypair.fromSeed(Uint8Array.from(slicedJsonData));
-let sourcePubkey = wallet.publicKey;
 
-// target wallet address
-const targetPubkey = new web3.PublicKey("HpiQyjcQk5KWDYTpSDvwbQxSfH6u7AfnneaNfdymZU6P"); // TODO: EDIT
+/**
+ * Function for sending lamports to target wallet
+ * @param {*} KeypairArg path to keypair file
+ * @param {*} TargetArg target wallet pubkey base58 string
+ * @param {*} LamportsArg amount of SOL to be send in lamports
+ */
+function sendLamports(KeypairArg, TargetArg, LamportsArg) {
 
-// Amount of transfered lamports
-let lampAmount = 5000; // TODO: EDIT
+    // read source wallet keypair
+    const keypair = require(KeypairArg);
+    let slicedJsonData = keypair.slice(0,32);
+    let wallet = web3.Keypair.fromSeed(Uint8Array.from(slicedJsonData));
+    let sourcePubkey = wallet.publicKey;
 
-// sum print
-console.log("sending from: " + sourcePubkey);
-console.log("sending to: " + targetPubkey);
-console.log("Amount: " + lampAmount + " lamports");
+    // target wallet address
+    const targetPubkey = new web3.PublicKey(TargetArg);
 
-// create transaction
-const {Transaction, SystemProgram, LAMPORTS_PER_SOL} = require("@solana/web3.js");
-let transaction = new Transaction();
-transaction.add(
-  SystemProgram.transfer({
-    fromPubkey: sourcePubkey, // sending sol from
-    toPubkey: targetPubkey, // sending sol to
-    lamports: lampAmount // amount of lamports to send
-  }) 
-);
+    // Amount of transfered lamports
+    let lampAmount = LamportsArg;
 
-// connect to cluster, sign and send transaction
-const {sendAndConfirmTransaction, clusterApiUrl, Connection} = require("@solana/web3.js");
-let connection = new Connection(clusterApiUrl('mainnet-beta')); // can be changed to testnet or devnet
-sendAndConfirmTransaction(
-  connection,
-  transaction,
-  [wallet]
-);
+    // sum print
+    console.log("sending from: " + sourcePubkey);
+    console.log("sending to: " + targetPubkey);
+    console.log("Amount: " + lampAmount + " lamports");
+
+    // create transaction
+    const {Transaction, SystemProgram, LAMPORTS_PER_SOL} = require("@solana/web3.js");
+    let transaction = new Transaction();
+    transaction.add(
+    SystemProgram.transfer({
+        fromPubkey: sourcePubkey, // sending sol from
+        toPubkey: targetPubkey, // sending sol to
+        lamports: lampAmount // amount of lamports to send
+    }) 
+    );
+
+    // connect to cluster, sign and send transaction
+    const {sendAndConfirmTransaction, clusterApiUrl, Connection} = require("@solana/web3.js");
+    let connection = new Connection(clusterApiUrl('mainnet-beta'));
+    sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [wallet]
+    );
+
+    console.log("DONE");
+
+}
